@@ -1,0 +1,17 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+.vercel/
+node_modules/
+
+# Personal source workbook and generated spreadsheet exports
+*.xlsx
+*.xls
+*.xlsm
+
+# Local files and backups
+*.bak
+*.tmp
+.DS_Store
+Thumbs.db

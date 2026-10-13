@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f6f2">
+  <meta name="description" content="Lập kế hoạch 12 tuần, theo dõi mục tiêu và điểm thực thi của bạn.">
+  <title>THE 12-WEEK YEAR TRACKER</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Điều hướng">
+      <a class="brand" href="#home" aria-label="THE 12-WEEK YEAR TRACKER">
+        <span class="brand-mark">12</span>
+        <span class="brand-copy"><strong>THE 12-WEEK</strong><small>YEAR TRACKER</small></span>
+      </a>
+      <div class="side-label">KHÔNG GIAN CỦA BẠN</div>
+      <nav class="nav-list">
+        <button class="nav-item active" data-view="overview"><span class="nav-icon">◫</span><span>Tổng quan</span></button>
+        <button class="nav-item" data-view="plan"><span class="nav-icon">▦</span><span>Kế hoạch 12 tuần</span></button>
+        <button class="nav-item" data-view="goals"><span class="nav-icon">◎</span><span>Mục tiêu</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="quote-card"><span class="quote-mark">“</span><p>Tiến bộ đến từ những cam kết nhỏ bạn giữ mỗi tuần.</p><small>THỰC THI MỖI TUẦN</small></div>
+        <div class="local-note"><span class="status-dot"></span><span>Dữ liệu lưu trên trình duyệt này</span></div>
+      </div>
+    </aside>
+
+    <main class="main-content" id="home">
+      <header class="topbar">
+        <div class="breadcrumb"><span>Kế hoạch cá nhân</span><span class="crumb-slash">/</span><strong id="breadcrumb-cycle">Chu kỳ hiện tại</strong></div>
+        <div class="top-actions">
+          <label class="year-picker">NĂM <select id="year-select" aria-label="Chọn năm"></select></label>
+          <button class="icon-button" id="import-button" title="Nhập workbook Excel" aria-label="Nhập Excel">↑</button>
+          <input id="file-input" type="file" accept=".xlsx,.xls,.xlsm" hidden>
+          <button class="button button-dark button-small" id="export-button"><span>↓</span> Xuất Excel</button>
+          <button class="avatar" title="Dữ liệu cá nhân trên thiết bị này">N</button>
+        </div>
+      </header>
+
+      <div class="page-wrap">
+        <section class="page-heading">
+          <div class="hero-copy"><div class="eyebrow"><span class="eyebrow-line"></span> KẾ HOẠCH • THỰC THI • TỔNG KẾT</div><h1>12 tuần. <em>Mỗi tuần một bước tiến.</em></h1><p class="subtitle">Chọn điều quan trọng. Lên kế hoạch cho tuần này. Ghi nhận từng bước bạn hoàn thành.</p></div>
+          <button class="button button-accent" id="add-goal-button"><span class="plus">＋</span> Thêm mục tiêu</button>
+        </section>
+
+        <section class="cycle-strip" aria-label="Các chu kỳ trong năm">
+          <div class="cycle-strip-head"><div><span class="section-kicker">HÀNH TRÌNH CỦA BẠN</span><h2>Một năm. Những bước tiến rõ ràng.</h2></div><div class="cycle-date-tools"><label>Ngày bắt đầu 12 tuần<input id="cycle-start" type="date" aria-label="Ngày bắt đầu chu kỳ 12 tuần"></label><strong id="cycle-range">12 tuần: hãy chọn ngày bắt đầu</strong><button class="text-button" id="add-cycle-button">＋ Thêm chu kỳ</button></div></div>
+          <div class="cycle-list" id="cycle-list"></div>
+        </section>
+
+        <section class="stats-grid" aria-label="Tổng quan tiến độ">
+          <article class="stat-card score-card"><div class="stat-top"><span>ĐIỂM THỰC THI</span><span class="stat-icon dark-icon">↗</span></div><div class="score-line"><strong id="overall-score">0%</strong><span class="score-caption">điểm chu kỳ</span></div><div class="meter"><span id="overall-meter"></span></div><div class="stat-foot"><span id="score-context">Bắt đầu bằng một kế hoạch nhỏ</span><span class="accent-arrow">↗</span></div></article>
+          <article class="stat-card"><div class="stat-top"><span>MỤC TIÊU TRỌNG TÂM</span><span class="stat-icon purple-icon">◎</span></div><div class="stat-value"><strong id="goal-count">0</strong><span>/ 4</span></div><div class="stat-foot"><span>Tối đa 4 mục tiêu trong tracker</span><span class="stat-mini-dot purple-dot"></span></div></article>
+          <article class="stat-card"><div class="stat-top"><span>ĐẦU VIỆC ĐÃ HOÀN THÀNH</span><span class="stat-icon orange-icon">✓</span></div><div class="stat-value"><strong id="done-count">0</strong><span id="task-total">/ 0</span></div><div class="stat-foot"><span>Được đánh dấu Thực tế</span><span class="stat-mini-dot orange-dot"></span></div></article>
+          <article class="stat-card"><div class="stat-top"><span>TIẾN ĐỘ CHU KỲ</span><span class="stat-icon green-icon">◷</span></div><div class="stat-value"><strong id="week-position">Tuần 1</strong></div><div class="stat-foot"><span id="days-left">12 tuần tập trung</span><span class="stat-mini-dot green-dot"></span></div></article>
+        </section>
+
+        <section class="content-grid">
+          <div class="panel plan-panel" id="plan-section">
+            <div class="panel-heading"><div><span class="section-kicker">TUẦN NÀY</span><h2>Kế hoạch thực thi</h2></div><div class="week-controls"><button class="round-button" id="prev-week" aria-label="Tuần trước">‹</button><span id="selected-week-label">TUẦN 1</span><button class="round-button" id="next-week" aria-label="Tuần sau">›</button></div></div>
+            <div class="week-overview"><div class="week-ring" id="week-ring"><div><strong id="week-score">0%</strong><small>điểm tuần</small></div></div><div class="week-summary"><strong id="week-title">Tuần 1 — Lên kế hoạch</strong><span id="week-date-range">01 Thg 1 – 07 Thg 1</span><p id="week-summary-copy">Chọn những đầu việc bạn cam kết thực hiện trong tuần này.</p></div><button class="week-switch" id="today-week">Tuần hiện tại <span>↗</span></button></div>
+            <div class="week-timeline" id="week-timeline" aria-label="Khoảng ngày của 12 tuần"></div>
+            <div class="table-scroll"><table class="task-table"><thead><tr><th>ĐẦU VIỆC</th><th>MỤC TIÊU</th><th>HẠN</th><th class="check-head">KẾ HOẠCH</th><th class="check-head">THỰC TẾ</th></tr></thead><tbody id="weekly-tasks"></tbody></table></div>
+            <div class="empty-state" id="weekly-empty" hidden><span>✳</span><strong>Chưa có đầu việc cho tuần này</strong><p>Thêm mục tiêu và đầu việc để bắt đầu lên kế hoạch.</p><button class="text-button" id="empty-add-task">＋ Thêm mục tiêu đầu tiên</button></div>
+            <div class="panel-footer"><span><span class="legend-plan"></span> Dự định thực hiện</span><span><span class="legend-done"></span> Đã hoàn thành</span><button class="text-button" id="view-all-tasks">Xem toàn bộ kế hoạch <span>→</span></button></div>
+          </div>
+
+          <aside class="panel focus-panel" id="goals-section"><div class="panel-heading"><div><span class="section-kicker">ĐIỀU QUAN TRỌNG</span><h2>Mục tiêu của bạn</h2></div><button class="dots-button" id="focus-add" aria-label="Thêm mục tiêu">＋</button></div><div class="goal-list" id="goal-list"></div><div class="goal-empty" id="goal-empty" hidden><span>◎</span><p>Chọn 1–4 mục tiêu để tập trung trong chu kỳ này.</p><button class="button button-outline" id="goal-empty-add">Tạo mục tiêu đầu tiên</button></div><div class="focus-footer"><span class="pulse-dot"></span><span>Giữ trọng tâm. Tiến bộ sẽ theo sau.</span></div></aside>
+        </section>
+
+        <section class="panel goals-detail" id="goals-detail">
+          <div class="panel-heading"><div><span class="section-kicker">BỨC TRANH LỚN</span><h2>Mục tiêu & chỉ số tiến độ</h2></div><button class="text-button" id="detail-add-goal">＋ Thêm mục tiêu</button></div>
+          <div class="goal-table-wrap"><table class="goal-table"><thead><tr><th>MỤC TIÊU</th><th>CHỈ SỐ NỖ LỰC</th><th>CHỈ SỐ KẾT QUẢ</th><th>ĐẦU VIỆC</th><th>TIẾN ĐỘ</th><th></th></tr></thead><tbody id="goal-details"></tbody></table></div>
+          <div class="goal-detail-empty" id="detail-empty" hidden>Chưa có mục tiêu nào. <button class="text-button" id="detail-empty-add">Tạo mục tiêu</button></div>
+        </section>
+
+        <footer class="page-footer"><span>THE 12-WEEK YEAR TRACKER <span class="footer-dot">•</span> THỰC HIỆN ĐIỀU QUAN TRỌNG</span><button class="text-button" id="data-info">Lưu trữ & Excel <span>↗</span></button></footer>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="goal-dialog" class="goal-dialog"><form method="dialog" id="goal-form"><div class="dialog-top"><span class="section-kicker">MỤC TIÊU CHU KỲ</span><button class="dialog-close" value="cancel" aria-label="Đóng">×</button></div><h2 id="dialog-title">Thêm mục tiêu mới</h2><input type="hidden" id="goal-id"><label>Tên mục tiêu<input id="goal-name" maxlength="140" placeholder="Ví dụ: Hoàn thành chứng chỉ chuyên môn"></label><div class="metric-fields"><label><span>Chỉ số nỗ lực<br><small>Effort Metric</small></span><input id="goal-effort" maxlength="180" placeholder="Hành động bạn sẽ thực hiện"></label><label><span>Chỉ số kết quả<br><small>Result Metric</small></span><input id="goal-result" maxlength="180" placeholder="Kết quả cụ thể cần đạt"></label></div><div class="actions-editor"><div class="actions-editor-head"><strong>Đầu việc <small>Action</small></strong><span>Thêm các hành động cụ thể và tuần hạn</span></div><div id="goal-actions-list"></div><button type="button" class="text-button" id="add-action-row">＋ Thêm đầu việc</button></div><div class="dialog-actions"><button type="button" class="button button-delete" id="delete-goal-button" hidden>Xóa mục tiêu</button><span class="dialog-spacer"></span><button class="button button-outline" value="cancel">Để sau</button><button class="button button-dark" id="save-goal" value="save">Lưu mục tiêu</button></div></form></dialog>
+  <dialog id="cycle-dialog" class="goal-dialog"><form method="dialog" id="cycle-form"><div class="dialog-top"><span class="section-kicker">CHU KỲ 12 TUẦN</span><button class="dialog-close" value="cancel" aria-label="Đóng">×</button></div><h2>Tạo chu kỳ mới</h2><label>Ngày bắt đầu<input id="new-cycle-start" type="date" required></label><p class="cycle-preview" id="new-cycle-preview">Chọn ngày bắt đầu để xem khoảng thời gian 12 tuần.</p><div class="dialog-actions"><button class="button button-outline" value="cancel">Để sau</button><button class="button button-dark" id="save-cycle" value="save">Tạo chu kỳ</button></div></form></dialog>
+  <dialog id="task-dialog" class="goal-dialog"><form method="dialog" id="task-form"><div class="dialog-top"><span class="section-kicker">ĐẦU VIỆC CỤ THỂ</span><button class="dialog-close" value="cancel" aria-label="Đóng">×</button></div><h2>Thêm đầu việc</h2><label>Nội dung đầu việc<input id="task-name" maxlength="180" placeholder="Mô tả hành động cụ thể"></label><label>Gắn với mục tiêu<select id="task-goal"></select></label><label>Tuần hạn hoàn thành<select id="task-due"></select></label><div class="dialog-actions"><button class="button button-outline" value="cancel">Để sau</button><button class="button button-dark" id="save-task" value="save">Lưu đầu việc</button></div></form></dialog>
+  <dialog id="notice-dialog" class="goal-dialog"><form method="dialog"><div class="dialog-top"><span class="section-kicker">LƯU TRỮ & ĐỒNG BỘ</span><button class="dialog-close" value="ok" aria-label="Đóng">×</button></div><h2>Dữ liệu của bạn</h2><p class="notice-copy">Bản hiện tại lưu thay đổi trong bộ nhớ trình duyệt trên thiết bị này. Dùng <strong>Nhập Excel</strong> để nạp workbook và <strong>Xuất Excel</strong> để tải về một bản cập nhật. Việc xuất không tự ghi đè file gốc.</p><p class="notice-copy"><strong>Đăng nhập và đồng bộ nhiều thiết bị chưa được cấu hình.</strong> Bản triển khai tĩnh không thể bảo vệ dữ liệu bằng mật khẩu chỉ ở phía trình duyệt. Trước khi đưa dữ liệu cá nhân vào bản Vercel công khai, cần thiết lập xác thực phía máy chủ và kho lưu trữ đồng bộ.</p><div class="dialog-actions"><button class="button button-dark" value="ok">Đã hiểu</button></div></form></dialog>
+</body>
+</html>
